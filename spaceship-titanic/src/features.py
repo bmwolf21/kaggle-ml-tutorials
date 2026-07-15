@@ -1,12 +1,12 @@
 """
-features.py — shared feature engineering for Spaceship Titanic.
+features.py - shared feature engineering for Spaceship Titanic.
 
 Imported by the modeling scripts so train and test get identical treatment.
 Design choices are driven by the EDA (see TUTORIAL.md Step 1):
 
 - Decode compound IDs: PassengerId -> Group/GroupSize; Cabin -> Deck/Num/Side.
 - Deterministic imputation using the CryoSleep<->spend link.
-- Group-level features (people travel — and are transported — together).
+- Group-level features (people travel - and are transported - together).
 """
 import numpy as np
 import pandas as pd
@@ -30,7 +30,7 @@ def build_features(train: pd.DataFrame, test: pd.DataFrame):
     """Return (X_train, y_train, X_test) with engineered, model-ready features.
 
     train/test are the raw CSVs. We concatenate them for ID-structure features
-    (group size, family size) — this uses only the ID columns, never the target,
+    (group size, family size) - this uses only the ID columns, never the target,
     so it does not leak.
     """
     y = train["Transported"].astype(int)

@@ -1,5 +1,5 @@
 """
-01_eda.py — Exploratory Data Analysis for Spaceship Titanic
+01_eda.py - Exploratory Data Analysis for Spaceship Titanic
 
 Angle 1 (compete): understand the data before modeling.
 Angle 2 (document): every finding printed here feeds TUTORIAL.md.
@@ -75,7 +75,7 @@ for col in ["HomePlanet", "CryoSleep", "Destination", "VIP"]:
     print(f"\n{col}:")
     print(rate.to_string())
 
-# CryoSleep is the big one — check spend behavior under CryoSleep
+# CryoSleep is the big one - check spend behavior under CryoSleep
 print("\n" + "=" * 70)
 print("SPEND vs CRYOSLEEP (asleep passengers can't spend)")
 print("=" * 70)

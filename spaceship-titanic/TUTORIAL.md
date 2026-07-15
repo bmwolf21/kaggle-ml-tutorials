@@ -1,4 +1,4 @@
-# Spaceship Titanic — Tutorial Log
+# Spaceship Titanic - Tutorial Log
 
 > Competition: <https://www.kaggle.com/competitions/spaceship-titanic>
 > Goal: predict whether a passenger was **Transported** to an alternate
@@ -9,9 +9,9 @@
 
 ## The three angles
 
-1. **Compete** — build models and submit to the leaderboard.
-2. **Document** — this file.
-3. **Translate** — `wildlife_translation/` reframes the same pipeline as a
+1. **Compete** - build models and submit to the leaderboard.
+2. **Document** - this file.
+3. **Translate** - `wildlife_translation/` reframes the same pipeline as a
    species-detection problem (see that folder's README once we reach it).
 
 ## Why this competition maps well to ecology
@@ -30,7 +30,7 @@ survey data looks like:
 
 ## Step log
 
-### Step 0 — Workspace & environment setup
+### Step 0 - Workspace & environment setup
 
 - Created `Kaggle/spaceship-titanic/` with `data/`, `notebooks/`, `src/`,
   `outputs/`, and `wildlife_translation/`.
@@ -38,14 +38,14 @@ survey data looks like:
 - Set up `.gitignore` so raw data and credentials never get committed.
 - **Pending:** Kaggle API credentials (`kaggle.json`) to enable data download.
 
-### Step 1 — Exploratory Data Analysis (`src/01_eda.py`)
+### Step 1 - Exploratory Data Analysis (`src/01_eda.py`)
 
 Ran a documented EDA script. Figures saved to `outputs/figures/`. Key findings:
 
-**Target is balanced** — `Transported` is 50.4% True / 49.6% False. Accuracy (the
+**Target is balanced** - `Transported` is 50.4% True / 49.6% False. Accuracy (the
 competition metric) is meaningful here; no resampling needed.
 
-**Missingness is light but pervasive** — every feature column is ~2.0–2.5%
+**Missingness is light but pervasive** - every feature column is ~2.0–2.5%
 missing, and **24% of rows have at least one missing value**. No single column is
 catastrophic, but we can't drop incomplete rows (we'd lose a quarter of the
 data). → Imputation is required, and "is-missing" flags may carry signal.
@@ -57,7 +57,7 @@ data). → Imputation is required, and "is-missing" flags may carry signal.
 - `Cabin = deck/num/side` → decks F & G dominate; `side` is P(ort)/S(tarboard),
   ~50/50; 199 cabins missing.
 
-**CryoSleep is the dominant predictor — and it's logically linked to spend:**
+**CryoSleep is the dominant predictor - and it's logically linked to spend:**
 - CryoSleep=True → **81.8%** transported; CryoSleep=False → only 32.9%.
 - CryoSleep passengers have **exactly 0** spend across all 5 amenities (they're
   asleep). → We can impute missing CryoSleep from spend (any spend ⇒ awake) and
@@ -71,7 +71,7 @@ VIP passengers transported slightly *less* (38% vs 51%).
 `Cabin`→Deck/Num/Side; `TotalSpend` + per-amenity + log transforms; deterministic
 CryoSleep/spend imputation; group-size and "traveling alone" flags.
 
-### Step 2 — Feature engineering (`src/features.py`)
+### Step 2 - Feature engineering (`src/features.py`)
 
 Built a shared feature module so train and test are transformed identically.
 24 features from the raw 13, driven by the EDA:
@@ -85,7 +85,7 @@ Built a shared feature module so train and test are transformed identically.
   never the target).
 - Categoricals encoded as integer codes (NaN → its own code, which trees split on).
 
-### Step 3 — Baseline model + first submission (`src/02_baseline_model.py`)
+### Step 3 - Baseline model + first submission (`src/02_baseline_model.py`)
 
 LightGBM, 5-fold stratified CV with early stopping.
 
@@ -100,16 +100,16 @@ LightGBM, 5-fold stratified CV with early stopping.
 
 **Submitted → public leaderboard score: 0.80547.** The tiny CV→LB gap (~0.005)
 confirms the cross-validation is trustworthy (no leakage, no overfit). This is a
-strong first result — competitive Spaceship Titanic scores sit around 0.80–0.82.
+strong first result - competitive Spaceship Titanic scores sit around 0.80–0.82.
 
 **Lesson for the tutorial:** most of the lift here came from *decoding compound
-fields* and the *deterministic CryoSleep/spend imputation* — domain logic beat
+fields* and the *deterministic CryoSleep/spend imputation* - domain logic beat
 raw model tuning. A plain model on the raw columns typically scores ~0.79.
 
 **Next:** tune / add XGBoost + ensemble, engineer group-fate features, then the
 wildlife translation (`wildlife_translation/`).
 
-### Step 4 — Model iteration: richer features, XGBoost, ensemble (`src/03_models_ensemble.py`)
+### Step 4 - Model iteration: richer features, XGBoost, ensemble (`src/03_models_ensemble.py`)
 
 Expanded the feature set from 24 → 39 (`features.py`), added a second model
 (XGBoost), and blended.
@@ -121,7 +121,7 @@ Expanded the feature set from 24 → 39 (`features.py`), added a second model
 - `CabinRegion` (cabin number bucketed along the ship).
 - Group aggregates (leak-safe): `GroupSpendMean`, `GroupCryoRate`, `GroupAgeMean`.
 
-**v3 features added — group-based imputation:** fill missing `HomePlanet`
+**v3 features added - group-based imputation:** fill missing `HomePlanet`
 (from Group, then Surname), `Destination`, `Deck`, `Side` from the most common
 value among groupmates. Structurally justified (a group shares a home planet),
 not a global guess.
@@ -131,15 +131,15 @@ not a global guess.
 | Model | CV accuracy | Public LB |
 |-------|-------------|-----------|
 | LightGBM, v1 features (baseline) | 0.8108 | 0.80547 |
-| LightGBM, v2+v3 features | 0.8121 | — |
-| XGBoost, v2+v3 features | 0.8094 | — |
+| LightGBM, v2+v3 features | 0.8121 | - |
+| XGBoost, v2+v3 features | 0.8094 | - |
 | **Blend (0.8·LGB + 0.2·XGB), v2** | 0.8126 | 0.80383 |
 | **Blend, v3 (group imputation)** | **0.8127** | 0.80547 |
 
 **The key lesson (write this big in the tutorial):** CV rose from 0.8108 to
 0.8127, but the **public leaderboard stayed flat at ~0.805** (0.80547 / 0.80383 /
 0.80547). The public LB is scored on only ~half the test set, so differences of
-~0.002 are **~3 passengers — pure noise.** *Trust cross-validation, not
+~0.002 are **~3 passengers - pure noise.** *Trust cross-validation, not
 leaderboard wiggles.* We deliberately did **not** keep resubmitting to chase the
 noise.
 
@@ -150,13 +150,13 @@ noise.
 - **`CryoSleep` is absent from the top 12** despite being the strongest single
   predictor in EDA. Reason: the spend features are near-perfect proxies (asleep
   ⇒ zero spend), so its signal is absorbed. **Importance ≠ predictive value when
-  features are correlated** — a caution that matters doubly in ecology, where
+  features are correlated** - a caution that matters doubly in ecology, where
   covariates like canopy cover and NDVI are collinear.
 
 **Where the model plateaued:** gradient boosting on these features tops out
 around **0.812 CV**. Further gains would need materially different methods
 (pseudo-labeling, neural nets, heavy tuning) with rising overfitting risk and
-diminishing returns — a good place to stop optimizing and start translating.
+diminishing returns - a good place to stop optimizing and start translating.
 
 ### Step 5 - Hyperparameter tuning and diverse ensemble (`src/04_tuning_ensemble.py`)
 
@@ -206,5 +206,35 @@ impossible >0.83 scores from leakage).
 1. Domain logic beat algorithmic tuning (0.79 raw -> 0.805 with features).
 2. Trust a held-out signal over an over-optimized in-sample score.
 3. More model complexity is not more skill once you are at the noise floor.
+
+### Step 6 - Wildlife translation (Angle 3, in R)
+
+Reapplied the entire pipeline to an ecological problem in
+`wildlife_translation/` (see that folder's README.md for the full mapping).
+The task: predict whether a species is `detected` at a survey site from habitat
+covariates and survey effort. Built on a simulated, fully reproducible dataset
+so no field data is involved and every Kaggle construct has a real ecological
+counterpart (transect groups, deterministic effort/passive-site link,
+transect-constant land cover, pervasive missingness).
+
+Model: random forest (`ranger`), the species-distribution-model standard, in
+place of gradient boosting. The workflow is identical; only the estimator changed.
+
+**The signature ecological result** (the sharper form of the "trust the honest
+held-out signal" lesson):
+
+| CV scheme | Accuracy | AUC |
+|-----------|----------|-----|
+| Random 5-fold | 0.74 | 0.81 |
+| Spatial-block | 0.67 | 0.76 |
+
+Random CV is optimistic by ~0.07 accuracy because site coordinates let the
+forest interpolate to nearby training sites (spatial autocorrelation).
+Spatial-block CV holds out whole regions and is the number to report. The same
+correlated-feature caution recurs: `canopy_cover` and `ndvi` correlate at ~0.90
+and split each other's importance, echoing how the spend columns masked
+CryoSleep on Kaggle.
+
+**All three angles are now complete for this competition.**
 
 <!-- Next steps get appended below as we go. -->

@@ -1,10 +1,10 @@
 """
-04_tuning_ensemble.py — tuned LightGBM + a diverse 4-model ensemble.
+04_tuning_ensemble.py - tuned LightGBM + a diverse 4-model ensemble.
 
 Angle 1 (compete): one disciplined pass at the ~0.82 honest ceiling.
   1. Tune LightGBM hyperparameters with Optuna (5-fold CV accuracy objective).
   2. Train 4 diverse models: tuned LGBM, XGBoost, CatBoost, HistGradientBoosting.
-  3. Blend by out-of-fold accuracy (equal-weight average — robust, avoids
+  3. Blend by out-of-fold accuracy (equal-weight average - robust, avoids
      overfitting fragile per-model weights).
 Angle 2 (document): prints tuned params, per-model CV, and the blend for TUTORIAL.md.
 

@@ -6,21 +6,21 @@ wildlife / environmental use case.
 
 Every project here is approached from **three angles**:
 
-1. **Compete** — actually work the dataset and produce leaderboard submissions.
-2. **Document** — record every step (`TUTORIAL.md` in each project) so it can be
+1. **Compete** - actually work the dataset and produce leaderboard submissions.
+2. **Document** - record every step (`TUTORIAL.md` in each project) so it can be
    turned into a teaching walkthrough later.
-3. **Translate** — take the challenges/solutions and apply them to a
+3. **Translate** - take the challenges/solutions and apply them to a
    wildlife/environmental problem (`wildlife_translation/` in each project).
 
 ## Projects
 
 | Project | Type | Status | Wildlife analogue |
 |---------|------|--------|-------------------|
-| [spaceship-titanic](spaceship-titanic/) | Binary classification | In progress | Species detection / occupancy from noisy survey covariates |
+| [spaceship-titanic](spaceship-titanic/) | Binary classification | All 3 angles complete (LB 0.80547, ~top 33%) | Species detection with spatial-block CV |
 
 ## Environment
 
-- Python via anaconda3 (`/home/bmwolf21/anaconda3/bin/python`) — pandas, numpy,
+- Python via anaconda3 (`/home/bmwolf21/anaconda3/bin/python`) - pandas, numpy,
   scikit-learn, xgboost, lightgbm, matplotlib, jupyter
 - Kaggle CLI (`kaggle`) for data download and submissions
 - R 4.6.1 for the wildlife-translation re-implementations

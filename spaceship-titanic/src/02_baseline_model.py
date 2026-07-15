@@ -1,5 +1,5 @@
 """
-02_baseline_model.py — first cross-validated model + leaderboard submission.
+02_baseline_model.py - first cross-validated model + leaderboard submission.
 
 Angle 1 (compete): LightGBM with 5-fold stratified CV to estimate accuracy,
 then refit on all data and predict the test set.
