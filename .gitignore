@@ -1,0 +1,27 @@
+# Kaggle credentials — NEVER commit
+kaggle.json
+**/kaggle.json
+
+# Raw competition data (re-downloadable via kaggle CLI)
+**/data/raw/
+**/data/processed/
+
+# Model artifacts and large outputs
+**/outputs/models/
+**/*.pkl
+**/*.joblib
+
+# Python
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+.venv/
+
+# R
+.Rhistory
+.RData
+.Rproj.user/
+
+# OS
+.DS_Store
+Thumbs.db
