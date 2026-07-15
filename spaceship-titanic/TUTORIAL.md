@@ -158,4 +158,53 @@ around **0.812 CV**. Further gains would need materially different methods
 (pseudo-labeling, neural nets, heavy tuning) with rising overfitting risk and
 diminishing returns — a good place to stop optimizing and start translating.
 
+### Step 5 - Hyperparameter tuning and diverse ensemble (`src/04_tuning_ensemble.py`)
+
+One disciplined pass at the honest ~0.82 ceiling: Optuna tuning of LightGBM
+(40 trials, 5-fold CV accuracy objective) plus three more algorithms for
+diversity (XGBoost, CatBoost, HistGradientBoosting).
+
+**Cross-validation results:**
+
+| Model | OOF accuracy |
+|-------|--------------|
+| LightGBM (Optuna-tuned) | 0.8139 |
+| HistGradientBoosting | 0.8127 |
+| CatBoost | 0.8103 |
+| XGBoost | 0.8079 |
+| Equal-weight blend of all four | 0.8112 |
+
+Two findings:
+1. The **equal-weight blend (0.8112) was worse than the tuned LightGBM alone**
+   (0.8139). Blending only helps when members are both strong and diverse; here
+   three of the four were weaker, so averaging dragged the good model down.
+2. The tuned LightGBM had the **best CV of the whole project (0.8139)** but the
+   **worst public LB (0.80009)**.
+
+**The optimizer's curse (the headline lesson).** Selecting hyperparameters that
+maximize CV accuracy over 40 trials makes that winning CV score optimistically
+biased: you are reporting the maximum of many noisy estimates, so part of the
+gain is the tuner fitting the specific fold splits. An honest estimate would need
+*nested* CV. Net effect: apparent CV gains that did not generalize.
+
+**The honest arc of the whole competition:**
+
+| Change | CV | Public LB | Verdict |
+|--------|-----|-----------|---------|
+| Baseline features | 0.8108 | 0.80547 | robust |
+| Domain feature engineering (v2+v3) | 0.8127 | 0.80547 | robust, real gain |
+| Optuna hyperparameter tuning | 0.8139 | 0.80009 | CV up, LB down (overfit) |
+
+**Final model selection.** We keep the **v3 group-imputation model
+(CV 0.8127, LB 0.80547)** as the final answer, not the higher-CV tuned model.
+When CV and a held-out signal disagree after aggressive tuning, prefer the
+simpler, more robust model. Public rank at this score: ~636 / 1,931 teams
+(top 33%; top ~28% of legitimate entries, since ~2% of the board has
+impossible >0.83 scores from leakage).
+
+**Three transferable lessons for the ecology angle:**
+1. Domain logic beat algorithmic tuning (0.79 raw -> 0.805 with features).
+2. Trust a held-out signal over an over-optimized in-sample score.
+3. More model complexity is not more skill once you are at the noise floor.
+
 <!-- Next steps get appended below as we go. -->
