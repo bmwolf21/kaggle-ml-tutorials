@@ -141,3 +141,25 @@ noise, consistent with the "trust honest evaluation" discipline.
 **Best honest model:** an XGBoost/GradientBoosting + regularized-linear blend.
 Linear models are unusually strong on this dataset, and their diversity from the
 trees is what the blend exploits.
+
+### Step 5 - Wildlife translation (Angle 3, in R)
+
+Reapplied the pipeline to an ecological regression in `wildlife_translation/`
+(see that folder's README for the full mapping). The task: predict animal
+**density** (continuous) at a survey site from habitat covariates, the abundance
+analogue of predicting `SalePrice`. Built on a simulated, reproducible survey so
+every House Prices construct has an ecological counterpart (present/absent habitat
+features with structural NAs, ordinal quality ratings, neighbor-imputed
+covariates, and aggregation-event outliers).
+
+Models: glmnet Lasso + ranger + gbm, the R analogues of the Kaggle stack. The
+blend beat every single model (CV RMSE(log) 0.487 vs best single 0.502),
+reproducing the linear-plus-tree diversity gain from the competition.
+
+**New cookbook patterns contributed** (regression-flavored, complementing
+Spaceship Titanic's detection patterns): structural-vs-genuine missingness,
+ordinal habitat-quality encoding, log-scale density regression with honest
+anomaly handling, and linear-plus-tree blending. Logged in
+`wildlife_translation/README.md` for later assembly into the standalone cookbook.
+
+**All three angles are now complete for House Prices.**
