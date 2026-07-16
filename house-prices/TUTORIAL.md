@@ -106,3 +106,38 @@ handling those is the natural next iteration.
 (honest scores cluster near 0.11 to 0.13). Next: outlier handling, a linear model
 (Ridge/Lasso, which do well here) blended with the GBM, then the wildlife
 translation as an abundance-regression cookbook entry.
+
+### Step 4 - Iteration: outliers, linear models, blending, stacking
+
+Two passes at moving up the leaderboard.
+
+**Pass A (`src/03_ensemble.py`):** dropped the 4 known outliers (GrLivArea >
+4000), added regularized linear models (LassoCV, RidgeCV, ElasticNetCV) on
+one-hot + RobustScaler features, and blended them with LightGBM and
+GradientBoosting via OOF-optimized weights.
+- CV dropped to 0.10833, but **LB only improved to 0.12333** (from 0.12502).
+- **Lesson (subtle):** removing outliers from the whole training set also removes
+  them from the validation folds, so that CV is measured on cleaner data than the
+  test set and is no longer comparable to the leaderboard. The baseline's CV and
+  LB matched to 5 decimals; this one had a 0.015 gap, which is the tell.
+
+**Pass B (`src/04_stack.py`):** fixed the evaluation by removing outliers only
+from the TRAINING side of each fold (validation stays complete), added XGBoost,
+and compared a weighted blend to a Ridge stacker.
+- Honest individual CVs are ~0.126 (confirming Pass A's 0.108 was inflated). The
+  weighted blend reached an honest CV of 0.11901; the Ridge stack 0.12066.
+- **LB: 0.12372**, marginally worse than Pass A despite the better CV.
+- **Lesson:** the blend weights are optimized on the same OOF they are scored
+  against (optimizer's curse), so that CV is slightly optimistic; and the public
+  LB is compressed and noisy in this range. Chasing it further is the trap we
+  warned about.
+
+**Result and decision.** Best submission is the Pass A blend at **LB 0.12333 =
+rank ~1,010 / 4,596 = top 22%**, clearing the top-25% goal. The leaderboard is
+severely compressed (top 25% = 0.12409, top 10% = 0.12029) and its top ~1% are
+mostly leakage (7 teams at literally 0.0). We lock in 0.12333 rather than chase
+noise, consistent with the "trust honest evaluation" discipline.
+
+**Best honest model:** an XGBoost/GradientBoosting + regularized-linear blend.
+Linear models are unusually strong on this dataset, and their diversity from the
+trees is what the blend exploits.

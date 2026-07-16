@@ -26,7 +26,10 @@ QUAL_COLS = ["ExterQual", "ExterCond", "BsmtQual", "BsmtCond", "HeatingQC",
              "KitchenQual", "FireplaceQu", "GarageQual", "GarageCond", "PoolQC"]
 
 
-def build_features(train: pd.DataFrame, test: pd.DataFrame):
+def engineer(train: pd.DataFrame, test: pd.DataFrame):
+    """Do all imputation and feature engineering, returning the combined frame
+    with categoricals left as 'category' dtype (not yet encoded), so callers can
+    apply model-appropriate encoding (codes for trees, one-hot for linear)."""
     y = np.log1p(train["SalePrice"])
     both = pd.concat([train.drop(columns=["SalePrice"]), test],
                      ignore_index=True)
@@ -76,10 +79,18 @@ def build_features(train: pd.DataFrame, test: pd.DataFrame):
         if both[c].skew() > 0.75:
             both[c] = np.log1p(both[c])
 
-    # Encode remaining nominal categoricals as integer codes (tree-friendly).
+    # Leave nominal categoricals as 'category' dtype for the caller to encode.
     for c in both.select_dtypes(exclude="number").columns:
-        both[c] = both[c].astype("category").cat.codes
+        both[c] = both[c].astype("category")
 
+    return both, y, n_train
+
+
+def build_features(train: pd.DataFrame, test: pd.DataFrame):
+    """Tree-model view: integer-coded categoricals."""
+    both, y, n_train = engineer(train, test)
+    for c in both.select_dtypes(include="category").columns:
+        both[c] = both[c].cat.codes
     X = both.iloc[:n_train].reset_index(drop=True)
     X_test = both.iloc[n_train:].reset_index(drop=True)
     return X, y, X_test, list(X.columns)
