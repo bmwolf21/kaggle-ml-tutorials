@@ -24,6 +24,9 @@ same workflow to a wildlife problem in R.
 - **[House Prices: Regression, Honestly](house-prices/TUTORIAL.md)** (regression).
   Public score 0.12333, top 22% of 4,596 teams, translated to an animal-density
   regression that reproduces the linear-plus-tree blending gain.
+- **[Store Sales: Time-Series Forecasting](store-sales/TUTORIAL.md)** (forecasting).
+  Public RMSLE 0.491 after diagnosing an extrapolation trap (0.615 -> 0.491),
+  translated to multi-series population-count forecasting with horizon-safe features.
 
 ## Projects
 
@@ -31,6 +34,7 @@ same workflow to a wildlife problem in R.
 |---------|------|--------|-------------------|
 | [spaceship-titanic](spaceship-titanic/) | Binary classification | All 3 angles complete (LB 0.80547, ~top 33%) | Species detection with spatial-block CV |
 | [house-prices](house-prices/) | Regression | All 3 angles complete (LB 0.12333, ~top 22%) | Animal-density regression with structural-NA handling |
+| [store-sales](store-sales/) | Time-series forecasting | All 3 angles complete (LB RMSLE 0.491) | Population-count forecasting with horizon-safe lags |
 
 ## Environment
 
