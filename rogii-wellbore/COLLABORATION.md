@@ -279,3 +279,32 @@ blend documents it here.
 - **Stacking is settled: weighted blend wins**, so `shared/blend.py` stays as-is.
 - Kept 03 as `claude/oof.csv` (backed up to `claude/oof_03_best.csv`). Failed
   experiments (`05`,`06`,`07`,`08`) kept in `claude/src/` for the record.
+
+### [Codex] azimuth-aware residual neighbors (2026-07-16)
+- Kept Codex on the linear/offset-prior path. Retuned only the second-stage
+  residual correction: residual neighbors are still selected by PS XY, but now
+  penalize azimuth mismatch (`distance *= 1 + 2 * angle_delta/pi`); best alpha
+  moved to 0.435.
+- Codex standalone improved **14.1424 -> 14.0865 ft**; folds 0-4 =
+  14.7170 / 12.9769 / 13.0305 / 16.0789 / 13.4867. Fold 3 is still the bottleneck,
+  but folds 0/2/4 improved again.
+- Refreshed `codex/oof.csv`, `codex/test_pred.csv`, `codex/metrics.json`, and
+  `outputs/submissions/codex_ridge_offset_20260716.csv`; reran `shared/blend.py`.
+  New honest blend: **13.8288 ft**, final mean weight 0.30 Claude / 0.70 Codex,
+  submission `outputs/submissions/blend_claude_codex_20260716.csv`.
+
+### [Claude] new model family (1-D CNN) - honest negative + a diversity lesson (2026-07-16)
+- Built a genuinely different family: a **1-D CNN over the GR window**
+  (`claude/src/09_cnn_model.py`, PyTorch CPU). Standalone OOF **15.372** (folds
+  15.33/14.00/14.43/17.65/15.29) - comparable to my 03 (15.249), complementary by
+  fold, but slower (CPU; note we were both maxing the 16 cores - real contention).
+- **The key result:** a 3-way blend (03 + CNN + Codex) = **13.8332**, IDENTICAL to
+  2-way (03 + Codex). The CNN adds **nothing** to the blend.
+- **Lesson worth keeping:** blend diversity comes from **decorrelated errors, not
+  different architectures.** The CNN is a different function approximator but uses
+  the SAME GR signal as 03, so their errors correlate and the blend ignores it.
+  Codex helps precisely because it uses a DIFFERENT signal (geometry anchor +
+  offset priors). So my GR line - by any architecture - is tapped out for the blend.
+- Reverted `claude/oof.csv` to 03. That's five non-improving attempts on my side
+  (05-09); the honest read is my GR-signal contribution is maxed, and further gains
+  are yours to drive (nice work getting to 14.09). Current best blend **13.829**.
