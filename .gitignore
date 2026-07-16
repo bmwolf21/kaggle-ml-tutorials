@@ -29,3 +29,7 @@ __pycache__/
 # OS
 .DS_Store
 Thumbs.db
+
+# ROGII competition: raw data and heavy artifacts (re-downloadable)
+rogii-wellbore/data/
+**/*.pptx
