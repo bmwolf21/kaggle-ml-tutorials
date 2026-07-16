@@ -1,4 +1,4 @@
-# Kaggle credentials — NEVER commit
+# Kaggle credentials - NEVER commit
 kaggle.json
 **/kaggle.json
 
@@ -10,6 +10,10 @@ kaggle.json
 **/outputs/models/
 **/*.pkl
 **/*.joblib
+
+# Training logs and notebook-generated submissions
+**/catboost_info/
+**/notebooks/submission.csv
 
 # Python
 __pycache__/
