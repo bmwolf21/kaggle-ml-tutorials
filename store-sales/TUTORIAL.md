@@ -116,3 +116,25 @@ lags), drop counters and macro trends that a tree cannot extend.
 
 The residual 0.40-to-0.49 gap is the honest cost of forecasting a genuinely unseen
 period, and it is as small as in-range tools can make visible.
+
+### Step 5 - Wildlife translation (Angle 3, in R)
+
+Reapplied the pipeline to population-count forecasting in `wildlife_translation/`
+(see that folder's README for the mapping). The task: forecast monthly counts for
+many monitoring series (site x species) 6 months ahead, on simulated data with
+seasonality, a climate driver, interventions, and a multi-year decline.
+
+Because the data is simulated, we know the true future, so we could measure the
+in-range-validation-vs-true-future gap directly (the Kaggle leaderboard could only
+imply it). Result: the true future window was about **0.066 RMSLE harder** than
+in-range validation, faithfully reproducing Store Sales' 0.40-to-0.49 gap.
+
+Honest note recorded in the translation: the simulation's trend covariates were
+genuine, so unlike Store Sales (where oil was a largely spurious proxy) dropping
+them did not help. The robust, transferable lesson is the same: judge a forecast
+on a truly out-of-time window, and use horizon-safe features.
+
+**New cookbook patterns contributed** (time-series): horizon-safe lag/rolling
+features, out-of-time evaluation, extrapolation-safe temporal features.
+
+**All three angles are now complete for Store Sales.**
