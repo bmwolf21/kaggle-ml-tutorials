@@ -1,0 +1,13 @@
+# Python dependencies for the Kaggle tutorials (Python 3.10).
+# Pinned to the versions this project was developed and verified against.
+pandas==1.4.2
+numpy==1.21.5
+scikit-learn==1.0.2
+lightgbm==4.6.0
+xgboost==2.1.4
+catboost==1.2.10
+optuna==4.9.0
+matplotlib==3.5.1
+kaggle>=1.7
+jupyter
+nbconvert

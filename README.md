@@ -12,6 +12,14 @@ Every project here is approached from **three angles**:
 3. **Translate** - take the challenges/solutions and apply them to a
    wildlife/environmental problem (`wildlife_translation/` in each project).
 
+## Featured tutorial
+
+**[Spaceship Titanic: An Honest, End-to-End Tutorial](spaceship-titanic/README.md)**
+walks through a full tabular Kaggle competition (final public score 0.805, about
+top third of 1,931 teams) and then re-applies the entire workflow to a wildlife
+species-detection problem in R. Start there. A [runnable notebook](spaceship-titanic/notebooks/spaceship_titanic_tutorial.ipynb)
+and the reproducible [scripts](spaceship-titanic/src/) are included.
+
 ## Projects
 
 | Project | Type | Status | Wildlife analogue |
