@@ -12,6 +12,10 @@ Every project here is approached from **three angles**:
 3. **Translate** - take the challenges/solutions and apply them to a
    wildlife/environmental problem (`wildlife_translation/` in each project).
 
+> **Companion repo:** the ecological techniques from these competitions are
+> distilled, organized by pattern, in the
+> [Wildlife Modeling Cookbook](https://github.com/bmwolf21/wildlife-modeling-cookbook).
+
 ## Featured tutorials
 
 Each project is a full "how we solved it" walkthrough that then re-applies the
