@@ -93,3 +93,60 @@ transects, effort-dependent detection, patchy covariates, and strong spatial
 structure. The same pipeline would apply to real detection / occupancy data,
 with spatial-block CV as the honest performance estimate rather than a naive
 random split.
+
+---
+
+## Extracted patterns for the wildlife cookbook
+
+These are the reusable, competition-agnostic ecological techniques harvested from
+this project. They are written in a standard template so that once several
+competitions exist, a separate wildlife-modeling cookbook repo can be assembled
+by pulling these blocks (each links back to its source, and the cookbook will not
+reproduce the Kaggle content).
+
+Source competition for all entries below: **Spaceship Titanic**
+(<https://github.com/bmwolf21/spaceship-titanic-tutorial>).
+
+### Pattern: Spatial-block cross-validation
+- **Ecological problem:** honest performance estimates when survey sites are
+  spatially autocorrelated and a naive random split leaks between neighbors.
+- **Technique:** tile the study area into a grid, assign whole blocks to folds so
+  train and test regions never touch, and report the block-CV score. Compare to
+  random CV to quantify the optimism (here: +0.07 accuracy).
+- **Key code:** `03_detection_model.R` (block assignment + `evaluate_cv`).
+- **Status:** ready to extract.
+
+### Pattern: Effort-corrected detection via deterministic imputation
+- **Ecological problem:** survey effort bounds what can be detected; a zero-effort
+  site is a structural zero, not a true absence, and must not be imputed like an
+  ordinary missing value.
+- **Technique:** encode deterministic rules (any detection implies effort > 0; a
+  passive / zero-effort site implies zero method minutes), separating structural
+  from statistical missingness before any model-based imputation.
+- **Key code:** `02_features.R` (deterministic effort block).
+- **Status:** ready to extract.
+
+### Pattern: Neighbor-based covariate imputation
+- **Ecological problem:** covariates that are constant within a sampling unit
+  (land cover within a transect) go missing at some sites.
+- **Technique:** fill from the mode/mean of the site's transect-mates rather than
+  a global summary, which is both more accurate and structurally justified.
+- **Key code:** `02_features.R` (`fill_by_group_mode`).
+- **Status:** ready to extract.
+
+### Pattern: Hierarchical sampling-ID decoding
+- **Ecological problem:** nested survey structure (transect -> site) is hidden
+  inside compound identifiers instead of being available as covariates.
+- **Technique:** decode IDs into features such as transect size and site
+  isolation, giving the model the sampling hierarchy explicitly.
+- **Key code:** `02_features.R` (transect-structure block).
+- **Status:** ready to extract.
+
+### Pattern: Correlated-covariate importance caution
+- **Ecological problem:** collinear habitat covariates (canopy cover and NDVI at
+  r = 0.9) split their shared signal, so an importance ranking understates each
+  and can mislead interpretation.
+- **Technique:** always read variable importance alongside a correlation check;
+  consider grouping or dropping collinear covariates before drawing conclusions.
+- **Key code:** `03_detection_model.R` (importance + correlation report).
+- **Status:** ready to extract.
