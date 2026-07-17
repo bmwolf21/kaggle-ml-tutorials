@@ -439,6 +439,45 @@ Bottom line: nothing to fix for correctness or leakage. Proceed with your tuning
   treat nested residuals as optional conservatism, and avoid steering/texture or
   hard high-dTVT splits unless a fold-honest gain appears.
 
+### [Codex] implemented Claude review hardening (2026-07-16)
+- Added `prediction_start_index()` in `codex/train_predict.py`: `TVT_input` must
+  be a clean non-null prefix with at least one post-PS row. Verified all 773 train
+  and 3 current test wells pass; this protects hidden test inference from silent
+  row shifts if an interior `TVT_input` NaN appears.
+- Applied the same PS helper in `codex/audit_residuals.py`. Full Codex rerun is
+  unchanged: **14.0865 ft**; reran `shared/blend.py`, still **13.8288 ft**.
+- Did not change to nested residual curves yet. Claude marked it optional; current
+  in-sample residual correction is CV/test-consistent and already passed leakage
+  review. Nested residuals are worth testing only as a future CV experiment, not
+  as an unproven hardening change before a submission.
+
+### [Codex] final-stage submission checks planned (2026-07-16)
+- Before submitting, I will run mechanical audits on the current best blend:
+  sample ID/order match, no NaNs, plausible TVT ranges, per-well continuity, and
+  blend-vs-solo deltas.
+- I will create a **leakage-pure public sanity variant** for diagnostics only:
+  final Codex/public predictions excluding the three public-overlap train wells
+  from final train pools, then rerun the weighted blend. This is not for public-LB
+  chasing; it quantifies how much the leaked public IDs affect the visible test.
+- I will run a nested-residual CV experiment if tractable. Goal: check whether the
+  current in-sample residual correction is optimistic versus a more conservative
+  residual curve construction. Only integrate if it gives a fold-honest gain or a
+  clear de-risking reason.
+
+### [Codex] final-stage checks completed (2026-07-16)
+- Added `codex/audit_submission.py`. Current best blend passes: 14,151 rows,
+  exact sample ID set/order, no NaNs/duplicates, plausible TVT range
+  11589.99-12227.86, smooth per-well steps (max step <= 1.47 ft).
+- Built diagnostic public-overlap-excluded Codex variant with
+  `--final-exclude-wells 000d7d20,00bbac68,00e12e8b`. Codex public-pure test
+  predictions differ from primary by only 0.37 ft MAE (max 1.77); public-pure
+  blend differs from primary blend by 0.26 ft MAE. Saved
+  `codex/test_pred_public_pure.csv` and
+  `outputs/submissions/blend_claude_codex_public_pure_20260716.csv` for sanity.
+- Ran `codex/experiment_nested_residuals.py`: nested residual curves are neutral /
+  slightly worse overall (**14.0872 vs 14.0865**), with fold gains on 0/1/4 but
+  losses on 2/3. Not integrated. Keep current production Codex and primary blend.
+
 ### [Claude] ack of Codex's review - good catch (2026-07-16)
 - Agreed on the public-submission caveat, and it's a correct, subtle catch: my
   test prediction averages all 5 fold models, so for the 3 public wells that
@@ -454,3 +493,19 @@ Bottom line: nothing to fix for correctness or leakage. Proceed with your tuning
   refit (yours). Not needed for private-CV work.
 - Net: both pipelines' core (the OOF CV we actually optimize) is independently
   confirmed clean. Good place to be. Proceed with your tuning; I'll keep supporting.
+
+### [Claude] submission notebook built - it's a CODE competition (2026-07-16)
+- File Upload is disabled: ROGII submits via a **Kaggle Notebook** that writes
+  `submission.csv` (Kaggle reruns it on the hidden test set - so THIS is how the
+  private set is scored, and why CV was the right target all along).
+- Built `submission_notebook.py` (repo root): self-contained, runs both pipelines
+  + blend (w=0.30 Claude / 0.70 Codex), writes `/kaggle/working/submission.csv`.
+  Reproduces our validated blend (**corr 0.99999**, mean diff 0.7 ft). Trains one
+  all-train model each (no CV needed at inference), predicts whatever test wells
+  are present. Uses only lightgbm/numpy/pandas (Kaggle-preinstalled; internet off).
+- **Codex, please sanity-check the codex section:** I inlined your
+  `train_predict.py` functions VERBATIM with your current params (ridge 1000,
+  offset k=10/60 w=0.52/0.48, dtvt_scale 0.92, residual k=10 alpha 0.435 azw 2.0).
+  If you retune anything, ping me the new values (or edit only the CODEX block's
+  constants in `submission_notebook.py`) and I'll re-verify the corr-with-blend.
+- Next: human creates the Kaggle notebook from this file, runs it, submits.
