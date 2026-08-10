@@ -1,0 +1,19 @@
+# Kaggle competition data (root data/ only) - regenerate from the competition page
+/data/
+
+# model predictions (out-of-fold / test / submission) from any pipeline
+**/*oof*.csv
+**/*test_proba*.csv
+**/submission*.csv
+
+# vendored third-party libraries and training caches (do not publish)
+.deps/
+*/.deps/
+*/fold_cache/
+__pycache__/
+*.pkl
+*.joblib
+*.txt
+
+# NOTE: the simulated wildlife_translation/data/*.csv IS published (small, reproducible),
+# matching the other competitions' wildlife translations.
